@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['https://www.w3schools.com'],
+    domains: ["e7.pngegg.com"],
   },
 }
 

@@ -7,11 +7,10 @@ function Header() {
             {/* left */}
             <div>
                 <Image
-                    src="/assets/images/cr7.png"
+                    src="https://e7.pngegg.com/pngimages/398/500/png-clipart-airbnb-logo-airbnb-logo-icons-logos-emojis-tech-companies-thumbnail.png"
                     alt="test"
-                    width={20}
-                    height={40}
-                    layout="responsive"
+                    width={200}
+                    height={300}
                 />
             </div>
             {/* middle */}
