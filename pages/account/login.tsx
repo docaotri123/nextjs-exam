@@ -1,9 +1,8 @@
-import Layout from '../../components/layout/layout';
 import { useRouter } from 'next/router';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
-import Link from 'next/link';
+import { Formik, Form, Field } from 'formik';
+import { useState } from 'react';
+import { ClipLoader } from 'react-spinners';
+// import 'animate.css';
 
 import { userService } from '../../services';
 import React from 'react';
@@ -16,51 +15,83 @@ interface LoginProps {
 }
 
 function Login() {
-    const router = useRouter();
+    const router = useRouter()
+    const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // form validation rules 
-    const validationSchema = Yup.object().shape({
-        username: Yup.string().required('Username is required'),
-        password: Yup.string().required('Password is required')
-    });
-    const formOptions = { resolver: yupResolver(validationSchema) };
-
-    // get functions to build form with useForm() hook
-    const { register, handleSubmit, formState } = useForm(formOptions);
-    const { errors } = formState;
-
-    async function onSubmit({ username, password }: LoginProps) {
-        await userService.login(username, password);
-        // get return url from query parameters or default to '/'
-        router.push('/');
+    const handleSubmit = async ({ username, password }: LoginProps) => {
+        setIsSubmitting(true);
+        try {
+            await new Promise((r) => setTimeout(r, 2000));
+            const response = { data: { token: 'abc' } }
+            if (response.data.token) {
+                userService.login(username, password);
+                router.push('/');
+            }
+        } catch (error) {
+            // setError(error?.response.data.message);
+            setError('error');
+            setIsSubmitting(false);
+        }
     }
 
     return (
-        <Layout>
-            <div className="card">
-                <h4 className="card-header">Login</h4>
-                <div className="card-body">
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <div className="form-group">
-                            <label>Username</label>
-                            <input type="text" name="username" {...register('username')}
-                                className={`form-control ${errors.username ? 'is-invalid' : ''}`} />
-                            {/* <div className="invalid-feedback">{errors.username?.message}</div> */}
-                        </div>
-                        <div className="form-group">
-                            <label>Password</label>
-                            <input type="password" name="password"  {...register('password')}
-                                className={`form-control ${errors.password ? 'is-invalid' : ''}`} />
-                            {errors.password && <div className="invalid-feedback">{errors.password?.message}</div>}
-                        </div>
-                        <button disabled={formState.isSubmitting} className="btn btn-primary">
-                            {formState.isSubmitting && <span className="spinner-border spinner-border-sm mr-1"></span>}
-                            Click Login
-                        </button>
-                        <Link href="/account/register" className="btn btn-link">Register</Link>
-                    </form>
-                </div>
+        <div className="flex items-center h-screen bg-gray-100">
+            <div className="w-full max-w-sm">
+                <Formik
+                    initialValues={{ username: '', password: '' }}
+                    onSubmit={handleSubmit}
+                >
+                    {
+                        ({ handleChange, values }) => (
+                            <Form>
+                                <div className="mb-4">
+                                    <label className="block text-gray-700 font-medium mb-2">
+                                        Email
+                                    </label>
+                                    <Field
+                                        className="w-full border border-gray-400 p-2 rounded-md"
+                                        type="email"
+                                        name="username"
+                                        onChange={handleChange}
+                                        value={values.username}
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-gray-700 font-medium mb-2">
+                                        Password
+                                    </label>
+                                    <Field
+                                        className="w-full border border-gray-400 p-2 rounded-md"
+                                        type="password"
+                                        name="password"
+                                        onChange={handleChange}
+                                        value={values.password}
+                                    />
+                                </div>
+                                {error && <p className="text-red-600">{error}</p>}
+                                <button
+                                    className="bg-indigo-600 text-white py-2 px-4
+                                    hover:cursor-pointer
+                                    rounded-md hover:bg-indigo-700"
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                >
+                                    Sign in
+                                </button>
+                            </Form>
+                        )
+                    }
+                </Formik>
             </div>
-        </Layout>
+            <div className="flex justify-center items-center h-full">
+                <ClipLoader
+                    size={50}
+                    color="#686769"
+                    loading={isSubmitting}
+                />
+            </div>
+
+        </div>
     );
 }
