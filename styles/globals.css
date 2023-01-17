@@ -96,3 +96,7 @@ a {
     color-scheme: dark;
   }
 }
+
+.h-custom {
+  height: calc(100% - 73px);
+}
